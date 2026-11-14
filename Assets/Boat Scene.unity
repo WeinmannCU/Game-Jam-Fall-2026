@@ -1578,7 +1578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1684f18673451461fbfbbc9c88063e06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipDamageTracker
-  useDemoValues: 1
+  useDemoValues: 0
   demoTotalRepairableTiles: 100
   demoMissingTiles: 25
 --- !u!4 &985291885
@@ -11200,7 +11200,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BoatTileDamage
   floorTilemap: {fileID: 567058443}
   brokenTilemap: {fileID: 1080985395}
+  damageTracker: {fileID: 985291884}
   player: {fileID: 522558518}
+  player2: {fileID: 0}
+  player1RepairKey: 19
+  player2RepairKey: 52
   brokenTiles:
   - {fileID: 11400000, guid: 41b12cf0b4aa6484b8baff6e9ee54dba, type: 2}
   - {fileID: 11400000, guid: c042d527fe36fb84292f127fc28eead5, type: 2}
@@ -11208,6 +11212,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 87eafd3a417f0eb4da5a65959fbeaa2f, type: 2}
   - {fileID: 11400000, guid: 1cca471ed9d2cab4ba5fd519d069c0ae, type: 2}
   breakInterval: 1
+  startingDamagePercent: 25
 --- !u!4 &1843739747
 Transform:
   m_ObjectHideFlags: 0
