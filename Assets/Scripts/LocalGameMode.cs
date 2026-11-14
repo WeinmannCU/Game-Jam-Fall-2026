@@ -3,6 +3,9 @@ using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public sealed class LocalGameMode : MonoBehaviour
 {
+    private static bool preserveModeOnNextLoad;
+    private static bool preservedTwoPlayerMode;
+
     [SerializeField] private bool twoPlayerMode;
     [SerializeField] private PlayerController playerOne;
     [SerializeField] private PlayerController playerTwo;
@@ -10,8 +13,20 @@ public sealed class LocalGameMode : MonoBehaviour
 
     public bool TwoPlayerMode => twoPlayerMode;
 
+    public static void PreserveModeForReload(bool twoPlayer)
+    {
+        preservedTwoPlayerMode = twoPlayer;
+        preserveModeOnNextLoad = true;
+    }
+
     private void Awake()
     {
+        if (preserveModeOnNextLoad)
+        {
+            twoPlayerMode = preservedTwoPlayerMode;
+            preserveModeOnNextLoad = false;
+        }
+
         if (playerOne == null || playerTwo == null || sharedCamera == null)
         {
             Debug.LogError("LocalGameMode needs both players and the shared CameraFollow reference.", this);
@@ -34,5 +49,18 @@ public sealed class LocalGameMode : MonoBehaviour
             playerOne.transform,
             twoPlayerMode ? playerTwo.transform : null,
             twoPlayerMode);
+    }
+
+    public void SetGameplayEnabled(bool gameplayEnabled)
+    {
+        if (playerOne != null)
+        {
+            playerOne.enabled = gameplayEnabled;
+        }
+
+        if (playerTwo != null)
+        {
+            playerTwo.enabled = gameplayEnabled && twoPlayerMode;
+        }
     }
 }

@@ -53,6 +53,23 @@ public class BoatTileDamage : MonoBehaviour
 
     private float timer;
     private int totalRepairableTiles;
+    private bool gameOver;
+
+    private void OnEnable()
+    {
+        if (damageTracker != null)
+        {
+            damageTracker.GameOver += HandleGameOver;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (damageTracker != null)
+        {
+            damageTracker.GameOver -= HandleGameOver;
+        }
+    }
 
     private void Start()
     {
@@ -114,8 +131,18 @@ public class BoatTileDamage : MonoBehaviour
         SyncDamageTracker();
     }
 
+    private void HandleGameOver()
+    {
+        gameOver = true;
+    }
+
     private void Update()
     {
+        if (gameOver)
+        {
+            return;
+        }
+
         timer += Time.deltaTime;
 
         if (timer >= Mathf.Max(0.1f, breakInterval))
@@ -141,6 +168,18 @@ public class BoatTileDamage : MonoBehaviour
         if (intactCells.Count == 0)
             return;
 
+        if (notifyTracker && damageTracker != null
+            && originals.Count + 1 >= damageTracker.SinkingTileThreshold)
+        {
+            while (intactCells.Count > 0)
+            {
+                BreakRandomTile(notifyTracker: false);
+            }
+
+            SyncDamageTracker();
+            return;
+        }
+
         int index = Random.Range(0, intactCells.Count);
         Vector3Int cell = intactCells[index];
         TileBase original = floorTilemap.GetTile(cell);
@@ -165,7 +204,8 @@ public class BoatTileDamage : MonoBehaviour
     // Each player repairs using their own position and the same damage state.
     public bool TryRepairNearby(Transform repairPlayer)
     {
-        if (!isActiveAndEnabled || repairPlayer == null || floorTilemap == null ||
+        if (gameOver || (damageTracker != null && damageTracker.IsSinking)
+            || !isActiveAndEnabled || repairPlayer == null || floorTilemap == null ||
             !repairPlayer.gameObject.activeInHierarchy)
             return false;
 
