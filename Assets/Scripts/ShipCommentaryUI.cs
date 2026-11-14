@@ -399,7 +399,7 @@ public sealed class ShipCommentaryUI : MonoBehaviour
         textRect.offsetMin = new Vector2(leftInset, -79f);
         textRect.offsetMax = new Vector2(-rightInset, -27f);
         commentaryText.enabled = availableWidth >= 100f;
-        commentaryText.fontSize = availableWidth < 220f ? 15 : availableWidth < 360f ? 18 : 20;
+        commentaryText.fontSize = availableWidth < 220f ? 18 : availableWidth < 360f ? 22 : 24;
         lastScreenWidth = Screen.width;
         lastCanvasScale = canvas.scaleFactor;
     }

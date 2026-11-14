@@ -29,13 +29,15 @@ public class BoatTileDamage : MonoBehaviour
 
     [Header("Damage")]
     [SerializeField] private TileBase[] brokenTiles = new TileBase[5];
-    [SerializeField, Min(0.1f)] private float startingBreakInterval = 1f;
+    [SerializeField, Min(0.1f)] private float startingBreakInterval = 8f;
     [SerializeField, Min(0.1f)] private float minimumBreakInterval = 0.5f;
     [SerializeField, Min(0.1f)] private float intervalReductionPerStep = 1f;
+    [SerializeField, Min(0.1f)] private float intervalReductionAfterStep = 0.5f;
+    [SerializeField, Min(0)] private int intervalReductionChangesAtStep = 6;
     [SerializeField, Min(0.1f)] private float difficultyStepDuration = 30f;
     [SerializeField, Min(1)] private int startingBatchSize = 1;
     [SerializeField, Min(1)] private int batchSizeIncrease = 1;
-    [SerializeField, Min(0)] private int batchIncreaseStartsAtStep = 6;
+    [SerializeField, Min(0)] private int batchIncreaseStartsAtStep = 1;
     [SerializeField, Min(1)] private int batchSizeIncreaseEverySteps = 1;
     [Tooltip("Percentage of breakable tiles randomly damaged when the scene starts. Applied once in Start.")]
     [Range(0f, 100f)]
@@ -227,7 +229,11 @@ public class BoatTileDamage : MonoBehaviour
     private float GetCurrentBreakInterval()
     {
         int step = Mathf.FloorToInt(gameplayElapsed / Mathf.Max(0.1f, difficultyStepDuration));
-        float interval = startingBreakInterval - step * intervalReductionPerStep;
+        int fullReductionSteps = Mathf.Min(step, intervalReductionChangesAtStep);
+        int reducedReductionSteps = Mathf.Max(0, step - intervalReductionChangesAtStep);
+        float interval = startingBreakInterval
+            - fullReductionSteps * intervalReductionPerStep
+            - reducedReductionSteps * intervalReductionAfterStep;
         return Mathf.Max(minimumBreakInterval, interval);
     }
 

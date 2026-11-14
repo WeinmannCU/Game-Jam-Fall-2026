@@ -18,6 +18,8 @@ public sealed class PlayerController : MonoBehaviour
     [SerializeField] private Camera gameplayCamera;
     [SerializeField] private RectTransform hudPanel;
     [SerializeField] private BoatTileDamage boatTileDamage;
+    [SerializeField] private DriftwoodInventory driftwoodInventory;
+    [SerializeField, Min(0.1f)] private float driftwoodInteractionRadius = 0.85f;
     [SerializeField, Min(0f)] private float boatMoveSpeed = 4f;
     [SerializeField, Min(0f)] private float waterMoveSpeed = 2f;
     [SerializeField, Min(0.1f)] private float jumpDuration = 0.45f;
@@ -46,11 +48,15 @@ public sealed class PlayerController : MonoBehaviour
     private bool twoPlayerMode;
 
     public int RepairsCompleted { get; private set; }
+    public DriftwoodInventory Inventory => driftwoodInventory;
 
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<CircleCollider2D>();
+        driftwoodInventory = driftwoodInventory != null
+            ? driftwoodInventory
+            : GetComponent<DriftwoodInventory>();
 
         if (inputActions == null || boatTilemap == null || boatBoundary == null || visual == null)
         {
@@ -75,6 +81,7 @@ public sealed class PlayerController : MonoBehaviour
         twoPlayerMode = useTwoPlayerMode;
         gameplayCamera = camera;
         RepairsCompleted = 0;
+        driftwoodInventory?.ResetInventory();
     }
 
     public bool InteractPressedThisFrame => interactAction != null && interactAction.WasPressedThisFrame();
@@ -155,15 +162,50 @@ public sealed class PlayerController : MonoBehaviour
             TryStartJump();
         }
 
-        if (interactAction != null && interactAction.WasPressedThisFrame() && boatTileDamage != null)
+        if (interactAction != null && interactAction.WasPressedThisFrame())
         {
-            if (boatTileDamage.TryRepairNearby(transform))
+            if (TryCollectNearbyDriftwood())
             {
-                RepairsCompleted++;
+                UpdateJumpVisual();
+                return;
+            }
+
+            if (boatTileDamage != null && driftwoodInventory != null &&
+                driftwoodInventory.WoodCount > 0 && boatTileDamage.TryRepairNearby(transform))
+            {
+                if (driftwoodInventory.TryConsumeWood())
+                {
+                    RepairsCompleted++;
+                }
+                else
+                {
+                    Debug.LogError("A successful repair could not consume its required driftwood.", this);
+                }
             }
         }
 
         UpdateJumpVisual();
+    }
+
+    private bool TryCollectNearbyDriftwood()
+    {
+        if (driftwoodInventory == null || driftwoodInventory.IsFull)
+        {
+            return false;
+        }
+
+        Collider2D[] nearbyColliders = Physics2D.OverlapCircleAll(transform.position, driftwoodInteractionRadius);
+        foreach (Collider2D nearbyCollider in nearbyColliders)
+        {
+            DriftwoodCollectible collectible = nearbyCollider.GetComponent<DriftwoodCollectible>();
+            if (collectible != null)
+            {
+                collectible.TryCollect(driftwoodInventory);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void FixedUpdate()
