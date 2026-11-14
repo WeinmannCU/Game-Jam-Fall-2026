@@ -29,8 +29,14 @@ public class BoatTileDamage : MonoBehaviour
 
     [Header("Damage")]
     [SerializeField] private TileBase[] brokenTiles = new TileBase[5];
-    [Min(0.1f)]
-    [SerializeField] private float breakInterval = 5f;
+    [SerializeField, Min(0.1f)] private float startingBreakInterval = 1f;
+    [SerializeField, Min(0.1f)] private float minimumBreakInterval = 0.5f;
+    [SerializeField, Min(0.1f)] private float intervalReductionPerStep = 1f;
+    [SerializeField, Min(0.1f)] private float difficultyStepDuration = 30f;
+    [SerializeField, Min(1)] private int startingBatchSize = 1;
+    [SerializeField, Min(1)] private int batchSizeIncrease = 1;
+    [SerializeField, Min(0)] private int batchIncreaseStartsAtStep = 6;
+    [SerializeField, Min(1)] private int batchSizeIncreaseEverySteps = 1;
     [Tooltip("Percentage of breakable tiles randomly damaged when the scene starts. Applied once in Start.")]
     [Range(0f, 100f)]
     [SerializeField] private float startingDamagePercent = 0f;
@@ -51,7 +57,8 @@ public class BoatTileDamage : MonoBehaviour
         Vector3Int.right
     };
 
-    private float timer;
+    private float breakTimer;
+    private float gameplayElapsed;
     private int totalRepairableTiles;
     private bool gameOver;
 
@@ -73,6 +80,9 @@ public class BoatTileDamage : MonoBehaviour
 
     private void Start()
     {
+        breakTimer = 0f;
+        gameplayElapsed = 0f;
+
         if (damageTracker == null)
         {
             DisableWithError("Assign the scene's ShipDamageTracker to Damage Tracker.");
@@ -126,7 +136,7 @@ public class BoatTileDamage : MonoBehaviour
 
         // Initialize the visuals before publishing the final starting counts.
         for (int i = 0; i < startingBrokenCount; i++)
-            BreakRandomTile(notifyTracker: false);
+            BreakRandomTile();
 
         SyncDamageTracker();
     }
@@ -143,12 +153,19 @@ public class BoatTileDamage : MonoBehaviour
             return;
         }
 
-        timer += Time.deltaTime;
+        float gameplayDelta = Time.deltaTime;
+        gameplayElapsed += gameplayDelta;
+        breakTimer += gameplayDelta;
 
-        if (timer >= Mathf.Max(0.1f, breakInterval))
+        float currentInterval = GetCurrentBreakInterval();
+        if (breakTimer >= currentInterval)
         {
-            timer = 0f;
-            BreakRandomTile();
+            breakTimer -= currentInterval;
+            BreakTileBatch(GetCurrentBatchSize());
+            if (gameOver)
+            {
+                return;
+            }
         }
 
         if (RepairPressed(false))
@@ -163,22 +180,36 @@ public class BoatTileDamage : MonoBehaviour
         return originals.ContainsKey(cell);
     }
 
-    private void BreakRandomTile(bool notifyTracker = true)
+    private void BreakTileBatch(int requestedCount)
     {
-        if (intactCells.Count == 0)
+        if (gameOver || intactCells.Count == 0 || requestedCount <= 0)
             return;
 
-        if (notifyTracker && damageTracker != null
-            && originals.Count + 1 >= damageTracker.SinkingTileThreshold)
+        int batchCount = Mathf.Min(requestedCount, intactCells.Count);
+        if (damageTracker != null &&
+            originals.Count + batchCount >= damageTracker.SinkingTileThreshold)
         {
             while (intactCells.Count > 0)
             {
-                BreakRandomTile(notifyTracker: false);
+                BreakRandomTile();
             }
 
             SyncDamageTracker();
             return;
         }
+
+        for (int i = 0; i < batchCount; i++)
+        {
+            BreakRandomTile();
+        }
+
+        SyncDamageTracker();
+    }
+
+    private void BreakRandomTile()
+    {
+        if (intactCells.Count == 0)
+            return;
 
         int index = Random.Range(0, intactCells.Count);
         Vector3Int cell = intactCells[index];
@@ -191,8 +222,26 @@ public class BoatTileDamage : MonoBehaviour
         originals.Add(cell, original);
         floorTilemap.SetTile(cell, null);
         brokenTilemap.SetTile(cell, brokenTiles[Random.Range(0, brokenTiles.Length)]);
-        if (notifyTracker)
-            SyncDamageTracker();
+    }
+
+    private float GetCurrentBreakInterval()
+    {
+        int step = Mathf.FloorToInt(gameplayElapsed / Mathf.Max(0.1f, difficultyStepDuration));
+        float interval = startingBreakInterval - step * intervalReductionPerStep;
+        return Mathf.Max(minimumBreakInterval, interval);
+    }
+
+    private int GetCurrentBatchSize()
+    {
+        int step = Mathf.FloorToInt(gameplayElapsed / Mathf.Max(0.1f, difficultyStepDuration));
+        if (step < batchIncreaseStartsAtStep)
+        {
+            return startingBatchSize;
+        }
+
+        int increaseCount = 1 +
+            (step - batchIncreaseStartsAtStep) / Mathf.Max(1, batchSizeIncreaseEverySteps);
+        return startingBatchSize + increaseCount * batchSizeIncrease;
     }
 
     // Returns true only when this press actually fixes a tile.

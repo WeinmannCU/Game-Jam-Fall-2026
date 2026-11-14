@@ -11315,7 +11315,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b1688a0fcdbfc8a4cb5c2214d41051ef, type: 2}
   - {fileID: 11400000, guid: 87eafd3a417f0eb4da5a65959fbeaa2f, type: 2}
   - {fileID: 11400000, guid: 1cca471ed9d2cab4ba5fd519d069c0ae, type: 2}
-  breakInterval: 1
+  startingBreakInterval: 1
+  minimumBreakInterval: 0.5
+  intervalReductionPerStep: 1
+  difficultyStepDuration: 30
+  startingBatchSize: 1
+  batchSizeIncrease: 1
+  batchIncreaseStartsAtStep: 6
+  batchSizeIncreaseEverySteps: 1
   startingDamagePercent: 25
 --- !u!4 &1843739747
 Transform:

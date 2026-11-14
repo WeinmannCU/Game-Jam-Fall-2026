@@ -363,7 +363,7 @@ public sealed class ShipCommentaryUI : MonoBehaviour
         textObject.transform.SetParent(topHudPanel, false);
         commentaryText = textObject.GetComponent<Text>();
         commentaryText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        commentaryText.fontSize = 17;
+        commentaryText.fontSize = 20;
         commentaryText.fontStyle = FontStyle.Bold;
         commentaryText.color = Color.white;
         commentaryText.alignment = TextAnchor.MiddleCenter;
@@ -399,7 +399,7 @@ public sealed class ShipCommentaryUI : MonoBehaviour
         textRect.offsetMin = new Vector2(leftInset, -79f);
         textRect.offsetMax = new Vector2(-rightInset, -27f);
         commentaryText.enabled = availableWidth >= 100f;
-        commentaryText.fontSize = availableWidth < 220f ? 12 : availableWidth < 360f ? 15 : 17;
+        commentaryText.fontSize = availableWidth < 220f ? 15 : availableWidth < 360f ? 18 : 20;
         lastScreenWidth = Screen.width;
         lastCanvasScale = canvas.scaleFactor;
     }
