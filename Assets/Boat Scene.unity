@@ -11645,6 +11645,11 @@ MonoBehaviour:
   damageTracker: {fileID: 985291884}
   survivalTimer: {fileID: 884930025}
   gameMode: {fileID: 0}
+  wallsRenderer: {fileID: 1618247395}
+  boatRenderer: {fileID: 1483000901}
+  playableFloorTilemap: {fileID: 567058443}
+  collapsedDeckTilemap: {fileID: 1080985395}
+  driftwoodTile: {fileID: 11400000, guid: 50e5079f056efac4dad645f17a3ae9f6, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
