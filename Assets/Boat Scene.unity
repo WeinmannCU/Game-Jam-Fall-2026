@@ -1629,21 +1629,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SurvivalTimer
   timerLabel: {fileID: 1790127686}
   gameState: {fileID: 985291884}
---- !u!114 &2200000013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884930024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af1391970d03245258ed460c1a2192b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameOverUI
-  damageTracker: {fileID: 985291884}
-  survivalTimer: {fileID: 884930025}
-  gameMode: {fileID: 0}
 --- !u!114 &884930026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11733,6 +11718,25 @@ MonoBehaviour:
   playerOne: {fileID: 676423387}
   playerTwo: {fileID: 2200000005}
   sharedCamera: {fileID: 504148093}
+--- !u!114 &2200000013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884930024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af1391970d03245258ed460c1a2192b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameOverUI
+  damageTracker: {fileID: 985291884}
+  survivalTimer: {fileID: 884930025}
+  gameMode: {fileID: 0}
+  wallsRenderer: {fileID: 1618247395}
+  boatRenderer: {fileID: 1483000901}
+  collapsedDeckTilemap: {fileID: 1080985395}
+  driftwoodTile: {fileID: 11400000, guid: 50e5079f056efac4dad645f17a3ae9f6, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
