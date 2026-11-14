@@ -20,6 +20,7 @@ public sealed class DriftwoodSpawner : MonoBehaviour
     [SerializeField] private Tilemap hullTilemap;
     [SerializeField] private ShipDamageTracker damageTracker;
     [SerializeField] private LocalGameMode gameMode;
+    [SerializeField] private Camera visibilityCamera;
     [SerializeField] private Tile driftwoodTile;
 
     [Header("Spawning")]
@@ -134,6 +135,9 @@ public sealed class DriftwoodSpawner : MonoBehaviour
         gameMode = gameMode != null
             ? gameMode
             : FindFirstObjectByType<LocalGameMode>();
+        visibilityCamera = visibilityCamera != null
+            ? visibilityCamera
+            : Camera.main;
 
         playerOneInventory = gameMode != null && gameMode.PlayerOne != null
             ? gameMode.PlayerOne.Inventory
@@ -340,47 +344,77 @@ public sealed class DriftwoodSpawner : MonoBehaviour
             }
         }
 
-        List<int> sideOrder = new List<int>();
-        for (int side = 0; side < candidateCellsBySide.Length; side++)
+        for (int visiblePass = 0; visiblePass < 2; visiblePass++)
         {
-            if (candidateCellsBySide[side].Count > 0)
+            bool visibleOnly = visiblePass == 0 && visibilityCamera != null;
+            List<int> sideOrder = new List<int>();
+            for (int side = 0; side < candidateCellsBySide.Length; side++)
             {
-                sideOrder.Add(side);
+                if (HasCandidateOnSide(side, visibleOnly))
+                {
+                    sideOrder.Add(side);
+                }
+            }
+
+            for (int i = sideOrder.Count - 1; i > 0; i--)
+            {
+                int swapIndex = Random.Range(0, i + 1);
+                (sideOrder[i], sideOrder[swapIndex]) = (sideOrder[swapIndex], sideOrder[i]);
+            }
+
+            sideOrder.Sort((first, second) => activeBySide[first].CompareTo(activeBySide[second]));
+
+            foreach (int side in sideOrder)
+            {
+                List<Vector3Int> sideCells = candidateCellsBySide[side];
+                int firstCandidate = Random.Range(0, sideCells.Count);
+                for (int attempt = 0; attempt < sideCells.Count; attempt++)
+                {
+                    Vector3Int cell = sideCells[(firstCandidate + attempt) % sideCells.Count];
+                    Vector3 position = oceanTilemap.GetCellCenterWorld(cell);
+                    position += new Vector3(
+                        Random.Range(-positionJitter, positionJitter),
+                        Random.Range(-positionJitter, positionJitter),
+                        0f);
+
+                    if ((visibleOnly && !IsVisible(position)) ||
+                        HasNearbyCollectible(position) ||
+                        IsInsideSolidCollider(position))
+                    {
+                        continue;
+                    }
+
+                    CreateCollectible(position);
+                    return true;
+                }
             }
         }
 
-        for (int i = sideOrder.Count - 1; i > 0; i--)
-        {
-            int swapIndex = Random.Range(0, i + 1);
-            (sideOrder[i], sideOrder[swapIndex]) = (sideOrder[swapIndex], sideOrder[i]);
-        }
+        return false;
+    }
 
-        sideOrder.Sort((first, second) => activeBySide[first].CompareTo(activeBySide[second]));
-
-        foreach (int side in sideOrder)
+    private bool HasCandidateOnSide(int side, bool visibleOnly)
+    {
+        foreach (Vector3Int cell in candidateCellsBySide[side])
         {
-            List<Vector3Int> sideCells = candidateCellsBySide[side];
-            int firstCandidate = Random.Range(0, sideCells.Count);
-            for (int attempt = 0; attempt < sideCells.Count; attempt++)
+            if (!visibleOnly || IsVisible(oceanTilemap.GetCellCenterWorld(cell)))
             {
-                Vector3Int cell = sideCells[(firstCandidate + attempt) % sideCells.Count];
-                Vector3 position = oceanTilemap.GetCellCenterWorld(cell);
-                position += new Vector3(
-                    Random.Range(-positionJitter, positionJitter),
-                    Random.Range(-positionJitter, positionJitter),
-                    0f);
-
-                if (HasNearbyCollectible(position) || IsInsideSolidCollider(position))
-                {
-                    continue;
-                }
-
-                CreateCollectible(position);
                 return true;
             }
         }
 
         return false;
+    }
+
+    private bool IsVisible(Vector3 position)
+    {
+        Vector3 viewportPosition = visibilityCamera.WorldToViewportPoint(position);
+        const float safeScreenMargin = 0.05f;
+        return viewportPosition.z > visibilityCamera.nearClipPlane &&
+            viewportPosition.x >= safeScreenMargin &&
+            viewportPosition.x <= 1f - safeScreenMargin &&
+            viewportPosition.y >= safeScreenMargin &&
+            viewportPosition.y <= 1f - safeScreenMargin;
     }
 
     private bool HasNearbyCollectible(Vector3 position)
@@ -423,7 +457,7 @@ public sealed class DriftwoodSpawner : MonoBehaviour
 
         SpriteRenderer spriteRenderer = collectibleObject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = driftwoodTile.sprite;
-        spriteRenderer.sortingOrder = 1;
+        spriteRenderer.sortingOrder = 5;
 
         CircleCollider2D circleCollider = collectibleObject.AddComponent<CircleCollider2D>();
         circleCollider.isTrigger = true;
