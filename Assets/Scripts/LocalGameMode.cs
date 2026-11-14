@@ -3,6 +3,9 @@ using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public sealed class LocalGameMode : MonoBehaviour
 {
+    private static bool preserveModeOnNextLoad;
+    private static bool preservedTwoPlayerMode;
+
     [SerializeField] private bool twoPlayerMode;
     [SerializeField] private PlayerController playerOne;
     [SerializeField] private PlayerController playerTwo;
@@ -10,12 +13,25 @@ public sealed class LocalGameMode : MonoBehaviour
 
     public bool TwoPlayerMode => twoPlayerMode;
 
+    public static void PreserveModeForReload(bool twoPlayer)
+    {
+        preservedTwoPlayerMode = twoPlayer;
+        preserveModeOnNextLoad = true;
+    }
+
     private void Awake()
     {
-        twoPlayerMode = PlayerPrefs.GetInt(
-            MainMenu.TwoPlayerModeKey,
-            twoPlayerMode ? 1 : 0) == 1;
-
+        if (preserveModeOnNextLoad)
+        {
+            twoPlayerMode = preservedTwoPlayerMode;
+            preserveModeOnNextLoad = false;
+        }
+        else
+        {
+            twoPlayerMode = PlayerPrefs.GetInt(
+                MainMenu.TwoPlayerModeKey,
+                twoPlayerMode ? 1 : 0) == 1;
+        }
         if (playerOne == null || playerTwo == null || sharedCamera == null)
         {
             Debug.LogError("LocalGameMode needs both players and the shared CameraFollow reference.", this);
@@ -38,5 +54,18 @@ public sealed class LocalGameMode : MonoBehaviour
             playerOne.transform,
             twoPlayerMode ? playerTwo.transform : null,
             twoPlayerMode);
+    }
+
+    public void SetGameplayEnabled(bool gameplayEnabled)
+    {
+        if (playerOne != null)
+        {
+            playerOne.enabled = gameplayEnabled;
+        }
+
+        if (playerTwo != null)
+        {
+            playerTwo.enabled = gameplayEnabled && twoPlayerMode;
+        }
     }
 }

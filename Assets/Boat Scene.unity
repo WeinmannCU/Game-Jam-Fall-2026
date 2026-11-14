@@ -1607,6 +1607,7 @@ GameObject:
   - component: {fileID: 884930027}
   - component: {fileID: 884930026}
   - component: {fileID: 884930025}
+  - component: {fileID: 2200000013}
   m_Layer: 0
   m_Name: HUD Canvas
   m_TagString: Untagged
@@ -1628,6 +1629,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SurvivalTimer
   timerLabel: {fileID: 1790127686}
   gameState: {fileID: 985291884}
+--- !u!114 &2200000013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884930024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af1391970d03245258ed460c1a2192b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameOverUI
+  damageTracker: {fileID: 985291884}
+  survivalTimer: {fileID: 884930025}
+  gameMode: {fileID: 0}
 --- !u!114 &884930026
 MonoBehaviour:
   m_ObjectHideFlags: 0
