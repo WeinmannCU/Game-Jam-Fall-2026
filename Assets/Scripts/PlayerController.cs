@@ -45,6 +45,8 @@ public sealed class PlayerController : MonoBehaviour
     private bool isPlayerTwo;
     private bool twoPlayerMode;
 
+    public int RepairsCompleted { get; private set; }
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -72,6 +74,7 @@ public sealed class PlayerController : MonoBehaviour
         isPlayerTwo = playerTwo;
         twoPlayerMode = useTwoPlayerMode;
         gameplayCamera = camera;
+        RepairsCompleted = 0;
     }
 
     public bool InteractPressedThisFrame => interactAction != null && interactAction.WasPressedThisFrame();
@@ -154,7 +157,10 @@ public sealed class PlayerController : MonoBehaviour
 
         if (interactAction != null && interactAction.WasPressedThisFrame() && boatTileDamage != null)
         {
-            boatTileDamage.TryRepairNearby(transform);
+            if (boatTileDamage.TryRepairNearby(transform))
+            {
+                RepairsCompleted++;
+            }
         }
 
         UpdateJumpVisual();

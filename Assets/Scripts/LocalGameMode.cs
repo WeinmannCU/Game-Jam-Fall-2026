@@ -12,6 +12,8 @@ public sealed class LocalGameMode : MonoBehaviour
     [SerializeField] private CameraFollow sharedCamera;
 
     public bool TwoPlayerMode => twoPlayerMode;
+    public int PlayerOneRepairs => playerOne != null ? playerOne.RepairsCompleted : 0;
+    public int PlayerTwoRepairs => playerTwo != null ? playerTwo.RepairsCompleted : 0;
 
     public static void PreserveModeForReload(bool twoPlayer)
     {
