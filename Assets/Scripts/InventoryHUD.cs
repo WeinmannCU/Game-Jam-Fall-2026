@@ -85,7 +85,7 @@ public sealed class InventoryHUD : MonoBehaviour
         inventoryText.font = stopwatch != null
             ? stopwatch.font
             : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        inventoryText.fontSize = 16;
+        inventoryText.fontSize = 24;
         inventoryText.fontStyle = FontStyle.Bold;
         inventoryText.color = Color.white;
         inventoryText.alignment = TextAnchor.MiddleCenter;
@@ -118,9 +118,9 @@ public sealed class InventoryHUD : MonoBehaviour
         textRect.anchorMin = new Vector2(0f, 1f);
         textRect.anchorMax = new Vector2(1f, 1f);
         textRect.pivot = new Vector2(0.5f, 0.5f);
-        textRect.offsetMin = new Vector2(12f, -106f);
-        textRect.offsetMax = new Vector2(-12f, -82f);
-        inventoryText.fontSize = Screen.width < 700 ? 13 : 16;
+        textRect.offsetMin = new Vector2(12f, -104f);
+        textRect.offsetMax = new Vector2(-12f, -72f);
+        inventoryText.fontSize = Screen.width < 700 ? 22 : 26;
         lastScreenWidth = Screen.width;
     }
 }

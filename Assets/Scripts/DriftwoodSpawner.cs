@@ -26,6 +26,7 @@ public sealed class DriftwoodSpawner : MonoBehaviour
     [SerializeField, Min(0f)] private float minimumSpawnDistance = 2f;
     [SerializeField, Min(0f)] private float maximumSpawnDistance = 5f;
     [SerializeField, Min(0.05f)] private float collectibleRadius = 0.24f;
+    [SerializeField, Min(0.1f)] private float collectibleVisualScale = 1.8f;
     [SerializeField, Min(0f)] private float positionJitter = 0.2f;
 
     private readonly List<DriftwoodCollectible> activeCollectibles = new List<DriftwoodCollectible>();
@@ -66,7 +67,7 @@ public sealed class DriftwoodSpawner : MonoBehaviour
     {
         if (damageTracker != null)
         {
-            damageTracker.DamageChanged += MarkSupplyForBalancing;
+            damageTracker.DamageChanged += HandleDamageChanged;
             damageTracker.GameOver += StopSpawning;
         }
 
@@ -85,7 +86,7 @@ public sealed class DriftwoodSpawner : MonoBehaviour
     {
         if (damageTracker != null)
         {
-            damageTracker.DamageChanged -= MarkSupplyForBalancing;
+            damageTracker.DamageChanged -= HandleDamageChanged;
             damageTracker.GameOver -= StopSpawning;
         }
 
@@ -418,6 +419,7 @@ public sealed class DriftwoodSpawner : MonoBehaviour
         GameObject collectibleObject = new GameObject("Floating Driftwood");
         collectibleObject.transform.position = position;
         collectibleObject.transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(0, 4) * 90f);
+        collectibleObject.transform.localScale = Vector3.one * collectibleVisualScale;
 
         SpriteRenderer spriteRenderer = collectibleObject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = driftwoodTile.sprite;
@@ -433,6 +435,16 @@ public sealed class DriftwoodSpawner : MonoBehaviour
     private void MarkSupplyForBalancing()
     {
         supplyNeedsBalancing = true;
+    }
+
+    private void HandleDamageChanged()
+    {
+        if (stopped)
+        {
+            return;
+        }
+
+        supplyNeedsBalancing = !BalanceSupply();
     }
 
     private void StopSpawning()
