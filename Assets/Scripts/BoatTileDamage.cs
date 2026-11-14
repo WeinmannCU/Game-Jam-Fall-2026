@@ -15,7 +15,7 @@ public class BoatTileDamage : MonoBehaviour
     [SerializeField] private ShipDamageTracker damageTracker;
     [Tooltip("Player 1's position, or a child Transform at their feet.")]
     [SerializeField] private Transform player;
-    [Tooltip("Optional. Leave empty until Player 2 exists.")]
+    [Tooltip("Player 2's position, or a child Transform at their feet.")]
     [SerializeField] private Transform player2;
 
     [Header("Repair keys")]

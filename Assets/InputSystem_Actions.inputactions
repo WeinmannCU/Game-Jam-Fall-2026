@@ -38,7 +38,7 @@
                     "id": "852140f2-7766-474d-8707-702459ba45f3",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "Hold",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -678,18 +678,7 @@
                 {
                     "name": "",
                     "id": "4c70a706-d18a-4b2b-a364-0347b5cf0035",
-                    "path": "<Keyboard>/leftMeta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4c70a706-d18a-4b2b-a364-0347b5cf0036",
-                    "path": "<Keyboard>/rightMeta",
+                    "path": "<Keyboard>/semicolon",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -700,18 +689,7 @@
                 {
                     "name": "",
                     "id": "4c70a706-d18a-4b2b-a364-0347b5cf0037",
-                    "path": "<Keyboard>/enter",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Interact",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4c70a706-d18a-4b2b-a364-0347b5cf0038",
-                    "path": "<Keyboard>/numpadEnter",
+                    "path": "<Keyboard>/rightShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

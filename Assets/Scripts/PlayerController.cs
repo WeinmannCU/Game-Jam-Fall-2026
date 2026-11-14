@@ -9,12 +9,15 @@ public sealed class PlayerController : MonoBehaviour
     private const float SafePositionSearchStep = 0.025f;
 
     private readonly List<Collider2D> overlappingColliders = new List<Collider2D>();
+    private readonly Vector3[] hudPanelCorners = new Vector3[4];
 
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private Tilemap boatTilemap;
     [SerializeField] private BoatWaterBoundary boatBoundary;
     [SerializeField] private Transform visual;
     [SerializeField] private Camera gameplayCamera;
+    [SerializeField] private RectTransform hudPanel;
+    [SerializeField] private BoatTileDamage boatTileDamage;
     [SerializeField, Min(0f)] private float boatMoveSpeed = 4f;
     [SerializeField, Min(0f)] private float waterMoveSpeed = 2f;
     [SerializeField, Min(0.1f)] private float jumpDuration = 0.45f;
@@ -84,9 +87,11 @@ public sealed class PlayerController : MonoBehaviour
         jumpAction = playerActionMap?.FindAction("Jump", throwIfNotFound: false);
         interactAction = playerActionMap?.FindAction("Interact", throwIfNotFound: false);
 
-        if (moveAction == null || jumpAction == null)
+        if (moveAction == null || jumpAction == null || interactAction == null)
         {
-            Debug.LogError($"PlayerController needs the {mapName}/Move and {mapName}/Jump input actions.", this);
+            Debug.LogError(
+                $"PlayerController needs the {mapName}/Move, {mapName}/Jump, and {mapName}/Interact input actions.",
+                this);
             enabled = false;
             return;
         }
@@ -147,6 +152,11 @@ public sealed class PlayerController : MonoBehaviour
             TryStartJump();
         }
 
+        if (interactAction != null && interactAction.WasPressedThisFrame() && boatTileDamage != null)
+        {
+            boatTileDamage.TryRepairNearby(transform);
+        }
+
         UpdateJumpVisual();
     }
 
@@ -191,12 +201,13 @@ public sealed class PlayerController : MonoBehaviour
             }
         }
 
-        SetMovementVelocity(moveInput * GetMovementSpeed(body.position));
+        Vector2 movement = moveInput * GetMovementSpeed(body.position);
+        SetMovementVelocity(movement);
     }
 
     private void SetMovementVelocity(Vector2 velocity)
     {
-        if (twoPlayerMode && gameplayCamera != null && playerCollider != null)
+        if (gameplayCamera != null && playerCollider != null)
         {
             float cameraDepth = Vector3.Dot(
                 transform.position - gameplayCamera.transform.position,
@@ -209,6 +220,20 @@ public sealed class PlayerController : MonoBehaviour
             float maxX = upperRight.x - horizontalPadding;
             float minY = lowerLeft.y + verticalPadding;
             float maxY = upperRight.y - verticalPadding;
+
+            if (hudPanel != null)
+            {
+                hudPanel.GetWorldCorners(hudPanelCorners);
+                Canvas canvas = hudPanel.GetComponentInParent<Canvas>();
+                Camera uiCamera = canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay
+                    ? canvas.worldCamera
+                    : null;
+                float hudBottomScreenY = RectTransformUtility.WorldToScreenPoint(uiCamera, hudPanelCorners[0]).y;
+                float hudBottomWorldY = gameplayCamera.ScreenToWorldPoint(
+                    new Vector3(0f, hudBottomScreenY, cameraDepth)).y;
+                maxY = Mathf.Min(maxY, hudBottomWorldY - verticalPadding);
+            }
+
             Vector2 nextPosition = body.position + velocity * Time.fixedDeltaTime;
 
             if (minX > maxX
@@ -355,8 +380,13 @@ public sealed class PlayerController : MonoBehaviour
 
     private float GetMovementSpeed(Vector2 position)
     {
-        Vector3Int boatCell = boatTilemap.WorldToCell(position);
-        return boatTilemap.HasTile(boatCell) ? boatMoveSpeed : waterMoveSpeed;
+        return IsDeckPosition(position) ? boatMoveSpeed : waterMoveSpeed;
+    }
+
+    private bool IsDeckPosition(Vector2 position)
+    {
+        Vector3Int cell = boatTilemap.WorldToCell(position);
+        return boatTilemap.HasTile(cell) || (boatTileDamage != null && boatTileDamage.IsBroken(cell));
     }
 
     private void RestoreBoundaryCollision()

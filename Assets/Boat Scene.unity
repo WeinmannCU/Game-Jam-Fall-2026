@@ -1316,6 +1316,8 @@ MonoBehaviour:
   boatBoundary: {fileID: 1483000906}
   visual: {fileID: 522558518}
   gameplayCamera: {fileID: 504148091}
+  hudPanel: {fileID: 462198449}
+  boatTileDamage: {fileID: 1843739746}
   boatMoveSpeed: 4
   waterMoveSpeed: 2
   jumpDuration: 0.45
@@ -11202,9 +11204,9 @@ MonoBehaviour:
   brokenTilemap: {fileID: 1080985395}
   damageTracker: {fileID: 985291884}
   player: {fileID: 522558518}
-  player2: {fileID: 0}
-  player1RepairKey: 19
-  player2RepairKey: 52
+  player2: {fileID: 2200000007}
+  player1RepairKey: 0
+  player2RepairKey: 0
   brokenTiles:
   - {fileID: 11400000, guid: 41b12cf0b4aa6484b8baff6e9ee54dba, type: 2}
   - {fileID: 11400000, guid: c042d527fe36fb84292f127fc28eead5, type: 2}
@@ -11392,6 +11394,8 @@ MonoBehaviour:
   boatBoundary: {fileID: 1483000906}
   visual: {fileID: 2200000007}
   gameplayCamera: {fileID: 504148091}
+  hudPanel: {fileID: 462198449}
+  boatTileDamage: {fileID: 1843739746}
   boatMoveSpeed: 4
   waterMoveSpeed: 2
   jumpDuration: 0.45
