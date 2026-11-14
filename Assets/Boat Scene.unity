@@ -11067,7 +11067,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c9bd580ea3a242840979aa1041d70488, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoatTileDamage
   floorTilemap: {fileID: 1483000902}
   brokenTilemap: {fileID: 567058443}
@@ -11078,7 +11078,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b1688a0fcdbfc8a4cb5c2214d41051ef, type: 2}
   - {fileID: 11400000, guid: 87eafd3a417f0eb4da5a65959fbeaa2f, type: 2}
   - {fileID: 11400000, guid: 1cca471ed9d2cab4ba5fd519d069c0ae, type: 2}
-  - {fileID: 11400000, guid: 3512ddca411709844becb05d892bcdc6, type: 2}
   breakInterval: 5
 --- !u!4 &1843739747
 Transform:
