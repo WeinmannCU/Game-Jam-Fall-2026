@@ -12,6 +12,10 @@ public sealed class LocalGameMode : MonoBehaviour
 
     private void Awake()
     {
+        twoPlayerMode = PlayerPrefs.GetInt(
+            MainMenu.TwoPlayerModeKey,
+            twoPlayerMode ? 1 : 0) == 1;
+
         if (playerOne == null || playerTwo == null || sharedCamera == null)
         {
             Debug.LogError("LocalGameMode needs both players and the shared CameraFollow reference.", this);
