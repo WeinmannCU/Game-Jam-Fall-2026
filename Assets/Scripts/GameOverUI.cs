@@ -85,8 +85,11 @@ public sealed class GameOverUI : MonoBehaviour
         survivalTimer.Stop();
         gameMode.SetGameplayEnabled(false);
         Time.timeScale = 0f;
+        CommentaryStopped?.Invoke();
         StartCoroutine(ShowSinkingSequence());
     }
+
+    public event Action CommentaryStopped;
 
     private IEnumerator ShowSinkingSequence()
     {

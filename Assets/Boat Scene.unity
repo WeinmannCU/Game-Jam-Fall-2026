@@ -1448,6 +1448,7 @@ GameObject:
   - component: {fileID: 884930026}
   - component: {fileID: 884930025}
   - component: {fileID: 2200000013}
+  - component: {fileID: 2200000014}
   m_Layer: 0
   m_Name: HUD Canvas
   m_TagString: Untagged
@@ -11650,6 +11651,28 @@ MonoBehaviour:
   playableFloorTilemap: {fileID: 567058443}
   collapsedDeckTilemap: {fileID: 1080985395}
   driftwoodTile: {fileID: 11400000, guid: 50e5079f056efac4dad645f17a3ae9f6, type: 2}
+--- !u!114 &2200000014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884930024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d77b42c91e8c44eddba678f19fb9bf02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShipCommentaryUI
+  damageTracker: {fileID: 985291884}
+  gameMode: {fileID: 2200000012}
+  gameOverUI: {fileID: 2200000013}
+  topHudPanel: {fileID: 462198449}
+  damageBar: {fileID: 728563141}
+  stopwatch: {fileID: 1790127688}
+  messageDuration: 4
+  messageCooldown: 10
+  stateCheckInterval: 1
+  repairInactivitySeconds: 20
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
