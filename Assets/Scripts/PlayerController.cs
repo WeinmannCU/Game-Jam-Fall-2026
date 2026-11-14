@@ -14,10 +14,12 @@ public sealed class PlayerController : MonoBehaviour
     [SerializeField] private Tilemap boatTilemap;
     [SerializeField] private BoatWaterBoundary boatBoundary;
     [SerializeField] private Transform visual;
+    [SerializeField] private Camera gameplayCamera;
     [SerializeField, Min(0f)] private float boatMoveSpeed = 4f;
     [SerializeField, Min(0f)] private float waterMoveSpeed = 2f;
     [SerializeField, Min(0.1f)] private float jumpDuration = 0.45f;
     [SerializeField, Min(1f)] private float jumpPeakScale = 1.3f;
+    [SerializeField, Min(0f)] private float screenEdgeMargin = 0.1f;
 
     private Rigidbody2D body;
     private CircleCollider2D playerCollider;
@@ -25,6 +27,7 @@ public sealed class PlayerController : MonoBehaviour
     private InputActionMap playerActionMap;
     private InputAction moveAction;
     private InputAction jumpAction;
+    private InputAction interactAction;
     private Vector2 moveInput;
     private Vector2 lastFacingDirection = Vector2.up;
     private Vector2 jumpDirection;
@@ -36,6 +39,8 @@ public sealed class PlayerController : MonoBehaviour
     private bool isJumping;
     private bool isLandingRecovery;
     private bool hasSafePosition;
+    private bool isPlayerTwo;
+    private bool twoPlayerMode;
 
     private void Awake()
     {
@@ -51,19 +56,42 @@ public sealed class PlayerController : MonoBehaviour
             return;
         }
 
+        visualBaseScale = visual.localScale;
+    }
+
+    private void Start()
+    {
+        InitializeInput();
+    }
+
+    public void ConfigureInput(bool playerTwo, bool useTwoPlayerMode, Camera camera)
+    {
+        isPlayerTwo = playerTwo;
+        twoPlayerMode = useTwoPlayerMode;
+        gameplayCamera = camera;
+    }
+
+    public bool InteractPressedThisFrame => interactAction != null && interactAction.WasPressedThisFrame();
+
+    private void InitializeInput()
+    {
         runtimeActions = Instantiate(inputActions);
-        playerActionMap = runtimeActions.FindActionMap("Player", throwIfNotFound: false);
+        string mapName = twoPlayerMode
+            ? (isPlayerTwo ? "Player 2" : "Player 1 Co-op")
+            : "Player";
+        playerActionMap = runtimeActions.FindActionMap(mapName, throwIfNotFound: false);
         moveAction = playerActionMap?.FindAction("Move", throwIfNotFound: false);
         jumpAction = playerActionMap?.FindAction("Jump", throwIfNotFound: false);
+        interactAction = playerActionMap?.FindAction("Interact", throwIfNotFound: false);
 
         if (moveAction == null || jumpAction == null)
         {
-            Debug.LogError("PlayerController needs the Player/Move and Player/Jump input actions.", this);
+            Debug.LogError($"PlayerController needs the {mapName}/Move and {mapName}/Jump input actions.", this);
             enabled = false;
             return;
         }
 
-        visualBaseScale = visual.localScale;
+        playerActionMap.Enable();
     }
 
     private void OnEnable()
@@ -133,7 +161,7 @@ public sealed class PlayerController : MonoBehaviour
         {
             if (isLandingRecovery)
             {
-                body.linearVelocity = Vector2.zero;
+                SetMovementVelocity(Vector2.zero);
                 if (TryRestoreToSafePosition())
                 {
                     CompleteJump();
@@ -149,7 +177,7 @@ public sealed class PlayerController : MonoBehaviour
             }
 
             float jumpSpeed = Mathf.Min(GetMovementSpeed(body.position), jumpStartSpeed);
-            body.linearVelocity = jumpDirection * jumpSpeed;
+            SetMovementVelocity(jumpDirection * jumpSpeed);
             jumpElapsed += Time.fixedDeltaTime;
 
             if (jumpElapsed >= jumpDuration)
@@ -163,7 +191,42 @@ public sealed class PlayerController : MonoBehaviour
             }
         }
 
-        body.linearVelocity = moveInput * GetMovementSpeed(body.position);
+        SetMovementVelocity(moveInput * GetMovementSpeed(body.position));
+    }
+
+    private void SetMovementVelocity(Vector2 velocity)
+    {
+        if (twoPlayerMode && gameplayCamera != null && playerCollider != null)
+        {
+            float cameraDepth = Vector3.Dot(
+                transform.position - gameplayCamera.transform.position,
+                gameplayCamera.transform.forward);
+            Vector3 lowerLeft = gameplayCamera.ViewportToWorldPoint(new Vector3(0f, 0f, cameraDepth));
+            Vector3 upperRight = gameplayCamera.ViewportToWorldPoint(new Vector3(1f, 1f, cameraDepth));
+            float horizontalPadding = playerCollider.bounds.extents.x + screenEdgeMargin;
+            float verticalPadding = playerCollider.bounds.extents.y + screenEdgeMargin;
+            float minX = lowerLeft.x + horizontalPadding;
+            float maxX = upperRight.x - horizontalPadding;
+            float minY = lowerLeft.y + verticalPadding;
+            float maxY = upperRight.y - verticalPadding;
+            Vector2 nextPosition = body.position + velocity * Time.fixedDeltaTime;
+
+            if (minX > maxX
+                || (nextPosition.x < minX && velocity.x < 0f)
+                || (nextPosition.x > maxX && velocity.x > 0f))
+            {
+                velocity.x = 0f;
+            }
+
+            if (minY > maxY
+                || (nextPosition.y < minY && velocity.y < 0f)
+                || (nextPosition.y > maxY && velocity.y > 0f))
+            {
+                velocity.y = 0f;
+            }
+        }
+
+        body.linearVelocity = velocity;
     }
 
     private void TryStartJump()
