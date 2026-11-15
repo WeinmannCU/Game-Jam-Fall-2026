@@ -4,13 +4,22 @@ using UnityEngine.UI;
 public sealed class MenuControlsGuide : MonoBehaviour
 {
     private GameObject guidePanel;
+    private MainMenu mainMenu;
 
     private void Awake()
     {
         Canvas canvas = GetComponent<Canvas>();
+        mainMenu = FindFirstObjectByType<MainMenu>();
         if (canvas == null)
         {
             Debug.LogError("MenuControlsGuide must be attached to a Canvas.", this);
+            enabled = false;
+            return;
+        }
+
+        if (mainMenu == null)
+        {
+            Debug.LogError("MenuControlsGuide needs the scene's MainMenu reference.", this);
             enabled = false;
             return;
         }
@@ -21,7 +30,7 @@ public sealed class MenuControlsGuide : MonoBehaviour
 
     private void CreateControlsButton(Transform parent)
     {
-        Button button = CreateButton(parent, "Controls", new Vector2(1f, 0f), new Vector2(-18f, 18f), new Vector2(150f, 42f));
+        Button button = CreateButton(parent, "Controls", new Vector2(1f, 0f), new Vector2(-18f, 20f), new Vector2(174f, 50f));
         button.onClick.AddListener(() => guidePanel.SetActive(true));
     }
 
@@ -46,14 +55,31 @@ public sealed class MenuControlsGuide : MonoBehaviour
         CreateText(panel.transform, "CONTROLS", 30, new Vector2(0f, 176f), new Vector2(620f, 46f), FontStyle.Bold, TextAnchor.MiddleCenter);
         CreateText(
             panel.transform,
-            "PLAYER 1\nMove: WASD\nJump: Space\nRepair: E\n\nPLAYER 2\nMove: Arrow Keys\nJump: Semicolon (;)\nRepair: Right Shift\n\nSingle-player: Player 1 can use WASD or Arrow Keys.\nMultiplayer: Player 1 uses WASD; Player 2 uses Arrow Keys.\nJump to cross the boat's outer boundary.\nStand near a broken plank and press Repair to fix it.",
+            "PLAYER 1\nMove: WASD\nJump: Space\nInteract / Repair: F\n\nPLAYER 2\nMove: Arrow Keys\nJump: Slash (/)\nInteract / Repair: Right Shift\n\nSingle-player: Player 1 can use WASD or Arrow Keys.\nMultiplayer: Player 1 uses WASD; Player 2 uses Arrow Keys.\nJump to cross the boat's outer boundary.\nStand near a broken plank and press Interact to collect driftwood or repair.",
             18,
             new Vector2(0f, -5f),
             new Vector2(610f, 330f),
             FontStyle.Normal,
             TextAnchor.MiddleCenter);
 
-        Button closeButton = CreateButton(panel.transform, "Close", new Vector2(0.5f, 0f), new Vector2(0f, 18f), new Vector2(150f, 42f));
+        Button returnButton = CreateButton(
+            panel.transform,
+            "Return to Title",
+            new Vector2(0.5f, 0f),
+            new Vector2(-190f, 18f),
+            new Vector2(220f, 54f));
+        returnButton.onClick.AddListener(() =>
+        {
+            guidePanel.SetActive(false);
+            mainMenu.ReturnToTitle();
+        });
+
+        Button closeButton = CreateButton(
+            panel.transform,
+            "Close",
+            new Vector2(0.5f, 0f),
+            new Vector2(150f, 18f),
+            new Vector2(174f, 50f));
         closeButton.onClick.AddListener(() => guidePanel.SetActive(false));
         guidePanel.SetActive(false);
     }

@@ -190,9 +190,37 @@ public sealed class GameOverUI : MonoBehaviour
         repairsLabel = CreateText("Repair Statistics", overlay.transform, string.Empty, 22, -20f);
         title.fontStyle = FontStyle.Bold;
 
+        CreateGameplayReturnButton();
         CreateButton(overlay.transform, "Play Again", -100f, RestartGame);
-        CreateButton(overlay.transform, "Home", -170f, ReturnHome);
+        CreateButton(overlay.transform, "Return to Title", -170f, ReturnHome);
         overlay.transform.SetAsLastSibling();
+    }
+
+    private void CreateGameplayReturnButton()
+    {
+        GameObject buttonObject = new GameObject(
+            "Return to Title Button",
+            typeof(RectTransform),
+            typeof(Image),
+            typeof(Button));
+        buttonObject.transform.SetParent(transform, false);
+
+        RectTransform rect = buttonObject.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = new Vector2(1f, 0f);
+        rect.pivot = new Vector2(1f, 0f);
+        rect.anchoredPosition = new Vector2(-24f, 24f);
+        rect.sizeDelta = new Vector2(220f, 54f);
+
+        Image image = buttonObject.GetComponent<Image>();
+        image.color = new Color(0.12f, 0.3f, 0.34f, 1f);
+
+        Button button = buttonObject.GetComponent<Button>();
+        button.targetGraphic = image;
+        button.onClick.AddListener(ReturnHome);
+
+        Text label = CreateText("Return to Title Label", buttonObject.transform, "Return to Title", 20, 0f);
+        label.fontStyle = FontStyle.Bold;
+        label.rectTransform.sizeDelta = rect.sizeDelta;
     }
 
     private static Text CreateText(string objectName, Transform parent, string value, int fontSize, float y)

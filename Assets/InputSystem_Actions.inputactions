@@ -432,7 +432,7 @@
                 {
                     "name": "",
                     "id": "1c04ea5f-b012-41d1-a6f7-02e963b52893",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -577,7 +577,7 @@
                 {
                     "name": "",
                     "id": "4c70a706-d18a-4b2b-a364-0347b5cf0016",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -678,7 +678,7 @@
                 {
                     "name": "",
                     "id": "4c70a706-d18a-4b2b-a364-0347b5cf0035",
-                    "path": "<Keyboard>/semicolon",
+                    "path": "<Keyboard>/slash",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

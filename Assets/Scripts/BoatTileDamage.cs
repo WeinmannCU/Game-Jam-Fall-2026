@@ -37,7 +37,7 @@ public class BoatTileDamage : MonoBehaviour
     [SerializeField, Min(0.1f)] private float difficultyStepDuration = 30f;
     [SerializeField, Min(1)] private int startingBatchSize = 1;
     [SerializeField, Min(1)] private int batchSizeIncrease = 1;
-    [SerializeField, Min(0)] private int batchIncreaseStartsAtStep = 1;
+    [SerializeField, Min(0)] private int batchIncreaseStartsAtStep = 10;
     [SerializeField, Min(1)] private int batchSizeIncreaseEverySteps = 1;
     [Tooltip("Percentage of breakable tiles randomly damaged when the scene starts. Applied once in Start.")]
     [Range(0f, 100f)]

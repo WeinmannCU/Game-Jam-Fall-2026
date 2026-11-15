@@ -20,8 +20,8 @@ public sealed class PlayerController : MonoBehaviour
     [SerializeField] private BoatTileDamage boatTileDamage;
     [SerializeField] private DriftwoodInventory driftwoodInventory;
     [SerializeField, Min(0.1f)] private float driftwoodInteractionRadius = 0.85f;
-    [SerializeField, Min(0f)] private float boatMoveSpeed = 4f;
-    [SerializeField, Min(0f)] private float waterMoveSpeed = 2f;
+    [SerializeField, Min(0f)] private float boatMoveSpeed = 5f;
+    [SerializeField, Min(0f)] private float waterMoveSpeed = 3.5f;
     [SerializeField, Min(0.1f)] private float jumpDuration = 0.45f;
     [SerializeField, Min(1f)] private float jumpPeakScale = 1.3f;
     [SerializeField, Min(0f)] private float screenEdgeMargin = 0.1f;
